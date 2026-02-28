@@ -64,4 +64,5 @@ for i, file_num in enumerate(tgt_files):
 # show the plot
 plt.suptitle("PDF Analysis: Transition from Random Noise to TAI (Sine Wave)", fontsize=16)
 plt.tight_layout()
+plt.savefig("Figure_13_TAI_Bimodal_limit_cycle_oscillation.png", dpi=300)
 plt.show()
