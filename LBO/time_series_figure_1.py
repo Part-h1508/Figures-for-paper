@@ -72,6 +72,7 @@ for i, idx in enumerate(plot_indices):
 plt.xlabel("Time (ms)")
 plt.suptitle(name1, fontsize=14)
 plt.tight_layout()
+plt.savefig("Figure_1_TimeSeriesLBO.png", dpi=300)
 plt.show()
 
 
