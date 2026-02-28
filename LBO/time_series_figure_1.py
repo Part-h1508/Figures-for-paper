@@ -28,6 +28,7 @@ import os
 
 # variables
 folder_path = "LBO" 
+name1 = "Figure 1: Time Series Evolution approaching LBO"
 main_file = os.path.join(folder_path, "Data details.xlsx")
 air_name = "Air (SLPM)"
 phi_name = "Equivalence ratio"
@@ -69,6 +70,8 @@ for i, idx in enumerate(plot_indices):
     axes[i].grid(True, alpha=0.3)
 
 plt.xlabel("Time (ms)")
-plt.suptitle("Figure 1: Time Series Evolution approaching LBO", fontsize=14)
+plt.suptitle(name1, fontsize=14)
 plt.tight_layout()
 plt.show()
+
+
