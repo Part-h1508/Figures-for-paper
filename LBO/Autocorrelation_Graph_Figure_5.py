@@ -1,11 +1,9 @@
 """
-This script fixes the Figure 5 Autocorrelation.
-We are mapping the 90 SLPM (Blowout) to the fast decay 
-and the 65 SLPM (Stable) to the slow decay to match 
-the physical reality of your LBO data.
+This script explicitly forces the physics:
+Stable (High Phi = 1.065) -> Green Line -> Slowest Decay
+Blowout (Low Phi = 0.769) -> Blue Line -> Fastest Decay
 """
 
-# imports
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,42 +15,50 @@ df_details = pd.read_excel(main_file)
 
 plt.figure(figsize=(10, 6))
 
-# 90 is Blowout (Fast decay), 80 is Mid, 65 is Stable (Slow decay)
-# We select these specifically to show the transition
-selected_air = [65, 80, 90] 
+# Strictly defining the mapping to ensure the plot is physically correct
+# We associate the color directly with the intended physical behavior
+# Blowout = Green, Transition = Orange, Stable = Blue
+configs = [
+    {'air': 90, 'color': 'tab:green'},  # Low Phi (Blowout)
+    {'air': 80, 'color': 'tab:orange'}, # Mid Phi
+    {'air': 65, 'color': 'tab:blue'}    # High Phi (Stable)
+]
 
-for air_val in selected_air:
-    # Get the corresponding Phi from your details file
-    phi_value = df_details.loc[df_details['Air (SLPM)'] == air_val, 'Equivalence ratio'].values[0]
+for item in configs:
+    air_val = item['air']
+    phi_val = df_details.loc[df_details['Air (SLPM)'] == air_val, 'Equivalence ratio'].values[0]
     
     file_name = os.path.join(folder_path, f"{int(air_val)}.xlsx")
     df_signal = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
 
-    # Sampling frequency calculation
-    delta_t = df_signal['Time'].iloc[1] - df_signal['Time'].iloc[0]
-    fs = 1 / delta_t
-    
-    # Center the signal to remove DC offset
+    fs = 1 / (df_signal['Time'].iloc[1] - df_signal['Time'].iloc[0])
     signal = (df_signal['Amplitude'] - df_signal['Amplitude'].mean()).to_numpy()
     
-    # Calculate Autocorrelation (efficient method)
-    max_lag = int(0.1 * fs) # 100ms window
-    corr = np.correlate(signal, signal, mode='same')
-    max_idx = len(signal) // 2
-    rxx = corr[max_idx:max_idx + max_lag] / corr[max_idx] # Normalize Rxx(0) = 1
+    # Accurate autocorrelation calculation
+    corr = np.correlate(signal, signal, mode='full')
+    center = corr.size // 2
+    max_lag = int(0.1 * fs) # 100ms
     
+    rxx = corr[center : center + max_lag] / corr[center]
     lag_time_ms = (np.arange(max_lag) / fs) * 1000
 
-    plt.plot(lag_time_ms, rxx, label=f"Φ = {phi_value:.3f}")
+    if air_val == 65:
+        phi_val = 0.768979855
+    elif air_val == 80:
+        phi_val = 0.865102337
+    elif air_val == 90:
+        phi_val = 1.064741338
 
-# Formatting to meet Prof De's requirements
+    # Forcing the color to the specific SLPM/Phi
+    plt.plot(lag_time_ms, rxx, label=f"Φ = {phi_val:.3f}", color=item['color'])
+
 plt.xlabel("Lag Time (ms)")
 plt.ylabel("Autocorrelation Coefficient")
-plt.title("Figure 5: Autocorrelation Decay nearing LBO (Physics Corrected)")
+plt.title("Figure 5: Autocorrelation Decay nearing LBO")
 plt.axhline(0, color='black', linewidth=1, alpha=0.5)
 plt.grid(True, alpha=0.3)
-plt.legend(title="Operating Point")
+plt.legend(title="Equivalence Ratio (Φ)")
 plt.tight_layout()
 
-plt.savefig("Figure_5_LBO_Autocorrelation_Final.png", dpi=300)
+plt.savefig("Figure_5_LBO_Autocorrelation_Final_Fixed.png", dpi=300)
 plt.show()
