@@ -1,66 +1,81 @@
 """
-this file is to simulate the 5th figure
-the graph describes physical behaviour of the signal correlation
+this file is to simulate the 3rd figure
+the graph describes physical behaviour of the line
+The fig includes:
+
+Normalized cumulative duration of LBO precursor events at
+different working conditions.
+
+We find:
+mean voltage --> blowout threshold at 72%
+--> count data points below threshold
+--> divide the count by total data points
 """
 
+"""
+Prof De reminded me that the LBO threshold should be 72%.
+I am using the 'Fi/FI_LBO' column for the X-axis because
+it shows the transition reaching the limit at 1.0.
+"""
+
+# imports
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 import os
+import numpy as np
 
 # variables
 folder_path = "LBO" 
 main_file = os.path.join(folder_path, "Data details.xlsx")
 air_name = "Air (SLPM)"
-phi_name = "Equivalence ratio"
+x_axis_col = "Fi/FI_LBO" # using normalized equivalence ratio
 
 # open the main data file
 df = pd.read_excel(main_file)
 
-plt.figure(figsize=(10, 6))
+# creating a list to store the calculated theta value
+theta_values = []
 
-# We ensure the order is consistent for the legend
-# High Phi (Stable) -> Mid Phi (Transition) -> Low Phi (Blowout)
-plot_indices = [9, 3, 0] 
-
-for idx in plot_indices:
-    row = df.iloc[idx]
+# loop thru the data file to get the air values
+for index, row in df.iterrows():
+    # get the air value for the current row
     air_value = row[air_name]
-    phi_value = row[phi_name]
     
+    # open the file with the air value from the LBO folder
     file_name = os.path.join(folder_path, str(int(air_value)) + ".xlsx")
     df1 = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
 
-    # sampling frequency
-    delta_t = df1['Time'].iloc[1] - df1['Time'].iloc[0]
-    fs = 1 / delta_t
-    
-    # subtract mean to focus on fluctuations
-    signal = df1['Amplitude'] - df1['Amplitude'].mean()
-    signal = signal.to_numpy()
-    
-    # Efficient autocorrelation calculation
-    n = len(signal)
-    max_lag = int(0.1 * fs) # 100ms
-    
-    # Use full correlation and slice the positive lag side
-    corr = np.correlate(signal, signal, mode='full')
-    corr = corr[corr.size // 2:] 
-    # Normalize such that Rxx(0) = 1.0
-    rxx = corr[:max_lag] / corr[0]
-    
-    lag_time_ms = (np.arange(max_lag) / fs) * 1000
+    # calculate the mean amplitude (Q_bar)
+    Q_bar = df1['Amplitude'].mean()
 
-    plt.plot(lag_time_ms, rxx, label=f"Φ = {phi_value:.3f}")
+    # set the threshold at 72% of the mean amplitude
+    threshold = 0.72 * Q_bar
 
-# formatting
-plt.xlabel("Lag Time (ms)")
-plt.ylabel("Autocorrelation Coefficient")
-plt.title("Figure 5: Autocorrelation Decay nearing LBO (Corrected)")
-plt.axhline(0, color='black', linewidth=1, alpha=0.5)
+    # count the number of data points below the threshold (flickers)
+    count_below_threshold = (df1['Amplitude'] < threshold).sum()
+
+    # calculate the total number of data points
+    total_data_points = len(df1['Amplitude'])
+
+    # check for division by zero
+    if total_data_points > 0:
+        # calculate theta
+        theta = count_below_threshold / total_data_points
+    else:
+        theta = 0
+
+    theta_values.append(theta)
+
+# now we plot the theta values against the normalized equivalence ratio
+plt.figure(figsize=(8, 6))
+plt.plot(df[x_axis_col], theta_values, marker='o', linestyle='-', color='tab:red')
+
+# labeling for the paper
+plt.xlabel("Fi/FI_LBO")
+plt.ylabel('Theta (Θ)')
+plt.title('Figure 3: Threshold Intermittency (LBO)')
 plt.grid(True, alpha=0.3)
-plt.legend(title="Equivalence Ratio (Φ)")
-plt.tight_layout()
 
-plt.savefig("Figure_5_LBO_Autocorrelation_Fixed.png", dpi=300)
+# saving for git
+plt.savefig("Figure_3_LBO_Theta.png", dpi=300)
 plt.show()
