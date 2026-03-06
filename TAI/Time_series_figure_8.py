@@ -1,6 +1,10 @@
 """
 this file is to simulate the 8th figure
 the graph describes physical behaviour of the TAI transition
+
+Prof mentioned we should show the full time series window
+from 0 to 10 seconds so that the transition from stable to
+limit cycle behaviour is clearly visible.
 """
 
 # imports
@@ -14,47 +18,43 @@ folder_path = "TAI"
 re_map = {15: 1565.85, 40: 4175.60, 53: 5532.67}
 plot_files = [15, 40, 53]
 
-# sampling frequency of your DAQ
+# sampling frequency of the DAQ
 fs = 44100
 
-# added sharey=True to make the amplitude growth visible
+# sharey=True to show amplitude growth clearly
 fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True, sharey=True)
 
 for i, file_num in enumerate(plot_files):
 
     re_val = re_map[file_num]
+
     file_name = os.path.join(folder_path, f"{file_num}.xlsx")
-    
-    # read amplitude only (handling the single column format)
+
+    # read amplitude column
     df = pd.read_excel(file_name, header=None)
-    
-    # using the first column for amplitude
+
     signal = df[0].to_numpy()
 
-    # subtract mean (center signal) to show fluctuations
+    # subtract mean to center the signal
     signal = signal - np.mean(signal)
 
-    # generate time axis manually based on sampling frequency
+    # create time axis
     time = np.arange(len(signal)) / fs
-    time_ms = time * 1000
 
-    # select first 50 ms to show the sine waves clearly
-    mask = time_ms <= 50
+    # select first 10 seconds
+    mask = time <= 10
 
-    axes[i].plot(
-        time_ms[mask],
-        signal[mask],
-        color='blue',
-        linewidth=0.8
-    )
+    axes[i].plot(time[mask], signal[mask], linewidth=0.4)
 
-    axes[i].set_title(f"Reynolds Number (Re): {re_val:.2f}")
     axes[i].set_ylabel("Fluctuation (V)")
+    axes[i].set_title(f"Re = {re_val:.2f}")
+
     axes[i].grid(True, alpha=0.3)
 
-plt.xlabel("Time (ms)")
-plt.suptitle("Figure 8: TAI Evolution (Unified Scale)", fontsize=14)
+plt.xlabel("Time (s)")
+
 plt.tight_layout()
 
-plt.savefig("Figure_8_TAI_TimeSeries_Unified.png", dpi=300)
+plt.savefig("Figure_8_TAI_TimeSeries.png", dpi=300)
+
 plt.show()
