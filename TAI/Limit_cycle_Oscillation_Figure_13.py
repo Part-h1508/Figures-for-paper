@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+from scipy.stats import norm, skew
 import os
 
 
@@ -42,13 +42,27 @@ for i, file_num in enumerate(tgt_files):
     # this can halp us ignore noise
     nor_signal = (signal - np.mean(signal)) / np.std(signal)
 
+    # calculate skewness of the signal
+    skew_val = skew(nor_signal)
+
+    # check if distribution is left or right skewed
+    if skew_val > 0:
+        skew_type = "Right Skew"
+    elif skew_val < 0:
+        skew_type = "Left Skew"
+    else:
+        skew_type = "Symmetric"
+
+    # print skewness value in terminal
+    print(f"Re = {re_map[file_num]} | Skewness = {skew_val:.4f} ({skew_type})")
+
     # create a subplot
     plt.subplot(1,3,i+1)
 
     # we plot the histogram now, keeping in mind
     # bins=105 has been adjusted according to graph by trial and erro
     # keeping density
-    plt.hist(nor_signal, bins=105, density=True, alpha=0.6, color='blue', label='1')
+    plt.hist(nor_signal, bins=105, density=True, alpha=0.6, color='blue', label='PDF')
 
     # now we plot the gaussian curvv and a bell curvv
     x_axis = np.linspace(-4, 4, 100)
@@ -58,11 +72,18 @@ for i, file_num in enumerate(tgt_files):
     plt.title(f"Re: {re_map[file_num]}")
     plt.xlabel("Normalized amplitude")
     plt.ylim(0, 0.6) # Lock y-axis so we can compare easily
+
+    # annotate skewness value on the plot
+    plt.text(-3.5, 0.5, f"Skew = {skew_val:.3f}")
+
     plt.legend()
     plt.grid(True, alpha=0.3)
 
-# show the plot
-plt.suptitle("PDF Analysis: Transition from Random Noise to TAI (Sine Wave)", fontsize=16)
+# adjust spacing
 plt.tight_layout()
+
+# save figure
 plt.savefig("Figure_13_TAI_Bimodal_limit_cycle_oscillation.png", dpi=300)
+
+# show the plot
 plt.show()
