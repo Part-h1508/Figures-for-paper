@@ -63,7 +63,6 @@ for i, file_num in enumerate(target_files):
     plt.ylim(-4, 4)
     plt.grid(True, alpha=0.3)
 
-plt.suptitle("Phase Space Reconstruction", fontsize=16)
 plt.tight_layout()
 plt.savefig("Figure_11_TAI_PhaseSpaceReconstruction.png", dpi=300)
 plt.show()
