@@ -68,13 +68,13 @@ for idx in plot_indices:
 # now we format the graph for the paper
 plt.xlabel("Frequency (Hz)")
 plt.ylabel("Power Spectral Density (PSD)")
-plt.title("Figure 2: Frequency Spectrum (LBO Precursors)")
 
 # Prof De requested to show precursors, so we zoom into 0-100 Hz
 plt.xlim(0, 100) 
 plt.grid(True, which="both", ls="-", alpha=0.3)
 plt.legend(title="Equivalence Ratio (Φ)")
 plt.tight_layout()
+plt.axhline(y=0.02, linestyle='--', color='black')
 
 # saving the figure for git
 plt.savefig("Figure_2_LBO_FrequencySpectrum.png", dpi=300)

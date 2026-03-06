@@ -69,11 +69,10 @@ for index, row in df.iterrows():
 # now we plot the theta values against the normalized equivalence ratio
 plt.figure(figsize=(8, 6))
 plt.plot(df[x_axis_col], theta_values, marker='o', linestyle='-', color='tab:red')
-
+plt.axhline(y=0.02, linestyle='--', color='black')
 # labeling for the paper
 plt.xlabel("Fi/FI_LBO")
 plt.ylabel('Theta (Θ)')
-plt.title('Figure 3: Normalized cumulative duration of precursor events (Θ) near LBO')
 plt.grid(True, alpha=0.3)
 
 # saving for git
