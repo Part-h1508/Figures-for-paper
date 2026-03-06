@@ -16,6 +16,9 @@ NRMS = std(amplitude) / mean(amplitude)
 I am using the 'Fi/FI_LBO' column for the X-axis 
 to show the spike at the 1.0 limit. This is the 
 primary tool the paper suggests for LBO prediction.
+
+Prof mentioned we should draw a horizontal line near NRMS = 0.15
+to visualize the fluctuation threshold and compare with Theta lead time.
 """
 
 # imports
@@ -53,9 +56,14 @@ for index, row in df.iterrows():
 plt.figure(figsize=(8, 6))
 plt.plot(df[x_axis_col], nrms_values, marker='s', color='tab:blue', label='Experimental NRMS')
 
+# threshold line suggested by Prof
+plt.axhline(y=0.145, linestyle='--', color='black')
+plt.axvline(x=1.115, linestyle='--', color='red',)
+
 plt.xlabel("Normalized Equivalence Ratio (Φ/Φ_lbo)")
 plt.ylabel('NRMS')
-plt.title('Figure 6: NRMS vs Normalized Equivalence Ratio')
+
 plt.grid(True, alpha=0.3)
+
 plt.savefig("Figure_6_NRMS.png", dpi=300)
 plt.show()
