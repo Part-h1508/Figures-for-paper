@@ -44,7 +44,7 @@ df = pd.read_excel(main_file)
 plt.figure(figsize=(10, 6))
 
 # using the same indices for the story: 90, 80, and 65 SLPM
-plot_indices = [9, 3, 0]
+plot_indices = [9, 0]
 colors = ['tab:blue', 'tab:orange', 'tab:green']
 
 # loop thru the selected data points
@@ -78,13 +78,7 @@ for i, idx in enumerate(plot_indices):
         
         p = norm.pdf(x, mu, std)
         
-        plt.plot(
-            x, p,
-            'k--',
-            linewidth=1.5,
-            label='Theoretical Gaussian'
-        )
-    
+
     # calculate and plot the PDF using a density histogram
     # density=True ensures total area = 1 (proper PDF)
     plt.hist(
@@ -100,11 +94,11 @@ for i, idx in enumerate(plot_indices):
 # formatting for the paper per Prof De's feedback
 plt.xlabel("Normalized Amplitude (I / I_mean)")
 plt.ylabel("Probability Density")
-plt.title("Figure 7.2: PDF Evolution nearing LBO")
+plt.title("Figure 7: PDF Evolution nearing LBO")
 plt.grid(True, alpha=0.3)
 plt.legend(title="Equivalence Ratio (Φ)")
 plt.tight_layout()
 
 # saving for git
-plt.savefig("Figure_7_2_LBO_PDF.png", dpi=300)
+plt.savefig("Figure_7_LBO_PDF.png", dpi=300)
 plt.show()

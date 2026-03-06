@@ -73,9 +73,9 @@ plt.plot(df[x_axis_col], theta_values, marker='o', linestyle='-', color='tab:red
 # labeling for the paper
 plt.xlabel("Fi/FI_LBO")
 plt.ylabel('Theta (Θ)')
-plt.title('Figure 3: Threshold Intermittency (LBO)')
+plt.title('Figure 3: Normalized cumulative duration of precursor events (Θ) near LBO')
 plt.grid(True, alpha=0.3)
 
 # saving for git
-plt.savefig("Figure_3_LBO_Theta.png", dpi=300)
+plt.savefig("Figure_3_LBO_Theta_revised.png", dpi=300)
 plt.show()

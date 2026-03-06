@@ -42,12 +42,7 @@ for item in configs:
     rxx = corr[center : center + max_lag] / corr[center]
     lag_time_ms = (np.arange(max_lag) / fs) * 1000
 
-    if air_val == 65:
-        phi_val = 0.768979855
-    elif air_val == 80:
-        phi_val = 0.865102337
-    elif air_val == 90:
-        phi_val = 1.064741338
+
 
     # Forcing the color to the specific SLPM/Phi
     plt.plot(lag_time_ms, rxx, label=f"Φ = {phi_val:.3f}", color=item['color'])
