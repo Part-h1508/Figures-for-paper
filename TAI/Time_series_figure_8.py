@@ -14,15 +14,15 @@ import numpy as np
 import os
 
 # variables
-folder_path = "."
+folder_path = os.path.dirname(os.path.abspath(__file__))
 re_map = {15: 1565.85, 40: 4175.60, 53: 5532.67}
 plot_files = [15, 40, 53]
 fs = 44100
 
 plt.rcParams.update({
-    "font.size": 16,
-    "axes.labelsize": 18,
-    "axes.titlesize": 18
+    "font.size": 20,
+    "axes.labelsize": 20,
+    "axes.titlesize": 20
 })
 
 fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True, sharey=True)
@@ -49,5 +49,5 @@ for i, file_num in enumerate(plot_files):
 axes[-1].set_xlabel("Time (s)", fontsize=18)
 
 plt.tight_layout()
-plt.savefig("Figure_8_TAI_TimeSeries.png", dpi=300)
+plt.savefig("Figure_8_TAI_TimeSeries_20_fonted.png", dpi=300)
 plt.show()
