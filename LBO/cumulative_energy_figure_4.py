@@ -68,8 +68,7 @@ for idx in plot_indices:
 
 # formatting for the paper
 plt.xlabel("Frequency (Hz)")
-plt.ylabel("Normalized Cumulative Energy")
-plt.title("Figure 4: Cumulative Energy Shift towards LBO")
+plt.ylabel("ξ(Fi)")
 
 # focus on the 0-200 Hz range to see the 'step' in energy
 plt.xlim(0, 200) 
@@ -79,5 +78,5 @@ plt.legend(title="Equivalence Ratio (Φ)")
 plt.tight_layout()
 
 # saving for git
-plt.savefig("Figure_4_LBO_CumulativeEnergy.png", dpi=300)
+plt.savefig("Figure_4_LBO_CumulativeEnergy_shifted.png", dpi=300)
 plt.show()

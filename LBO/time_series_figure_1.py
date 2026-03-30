@@ -23,54 +23,46 @@ Prof mentioned we should plot the FULL time series (20 seconds)
 instead of the earlier 100 ms window so the intermittency can be seen clearly.
 """
 
-# imports
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-# variables
-folder_path = "LBO" 
-main_file = os.path.join(folder_path, "Data details.xlsx")
-air_name = "Air (SLPM)"
-phi_name = "Equivalence ratio"
+plt.rcParams.update({
+    "font.size": 16,
+    "axes.labelsize": 18,
+    "axes.titlesize": 18,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14
+})
 
-# open the main data file
+folder_path = "."
+main_file = os.path.join(folder_path, "Data details.xlsx")
+
 df = pd.read_excel(main_file)
 
-# select the indices for lowest, middle, and highest Phi
-# index 9 (90 SLPM) --> 0.768
-# index 3 (80 SLPM) --> 0.865
-# index 0 (65 SLPM) --> 1.064
-plot_indices = [9, 3, 0] 
+plot_indices = [9, 3, 0]
 
 fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
 
 for i, idx in enumerate(plot_indices):
     row = df.iloc[idx]
-    air_value = row[air_name]
-    phi_value = row[phi_name]
-    
-    # open the file from the LBO folder
-    file_name = os.path.join(folder_path, str(int(air_value)) + ".xlsx")
+    air_value = row["Air (SLPM)"]
+    phi_value = row["Equivalence ratio"]
+
+    file_name = os.path.join(folder_path, f"{int(air_value)}.xlsx")
     df1 = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
 
-    # calculate sampling frequency from the data
-    delta_t = df1['Time'].iloc[1] - df1['Time'].iloc[0]
-    fs = 1 / delta_t
-    
-    # time axis in seconds starting from zero
     time_s = df1['Time'] - df1['Time'].iloc[0]
 
-    # plotting the FULL signal (~20 seconds)
-    axes[i].plot(time_s, df1['Amplitude'], color='red', linewidth=0.4)
-    
-    # labeling with Equivalence ratio per Prof De's request
-    axes[i].set_title(f"Equivalence Ratio (Φ): {phi_value:.3f}")
-    axes[i].set_ylabel("Amplitude")
+    axes[i].plot(time_s, df1['Amplitude'], linewidth=0.7)
+
+    axes[i].set_title(f"Φ = {phi_value:.3f}", fontsize=18)
+    axes[i].set_ylabel("Amplitude", fontsize=16)
     axes[i].grid(True, alpha=0.3)
 
-plt.xlabel("Time (s)")
+axes[-1].set_xlabel("Time (s)", fontsize=18)
+
 plt.tight_layout()
-plt.savefig("Figure_1_TimeSeriesLBO.png", dpi=300)
+plt.savefig("Figure_1_TimeSeriesLBO_fonted.png", dpi=300)
 plt.show()

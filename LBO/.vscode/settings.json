@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd \"c:\\\\Users\\\\katti\\\\Desktop\\\\college\\\\MDP\\\\non MDP\\\\Paper figures\\\\LBO\" ; python time_series_figure_1\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

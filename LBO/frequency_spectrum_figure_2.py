@@ -20,62 +20,65 @@ I am zooming the X-axis to 100Hz to show the rumble
 that corresponds to the humps seen in the time series.
 """
 
-# imports
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.signal import welch
 import numpy as np
 import os
 
-# variables
-folder_path = "LBO" 
-main_file = os.path.join(folder_path, "Data details.xlsx")
-air_name = "Air (SLPM)"
-phi_name = "Equivalence ratio"
+plt.rcParams.update({
+    "font.size": 16,
+    "axes.labelsize": 18,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+    "legend.fontsize": 14
+})
 
-# open the main data file
+folder_path = "."
+main_file = os.path.join(folder_path, "Data details.xlsx")
+
 df = pd.read_excel(main_file)
 
-# setting up the plot
 plt.figure(figsize=(10, 6))
 
-# using the same indices as Figure 1 for consistency
-# index 9 (90 SLPM), index 3 (80 SLPM), index 0 (65 SLPM)
 plot_indices = [9, 3, 0]
 
-# loop thru the selected data points
 for idx in plot_indices:
     row = df.iloc[idx]
-    air_value = row[air_name]
-    phi_value = row[phi_name]
-    
-    # open the file from the LBO folder
-    file_name = os.path.join(folder_path, str(int(air_value)) + ".xlsx")
+    air_value = row["Air (SLPM)"]
+    phi_value = row["Equivalence ratio"]
+
+    file_name = os.path.join(folder_path, f"{int(air_value)}.xlsx")
     df1 = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
 
-    # calculate sampling frequency from the data
     delta_t = df1['Time'].iloc[1] - df1['Time'].iloc[0]
     fs = 1 / delta_t
-    
-    # calculate the power spectral density using welch method
-    # nperseg=4096 gives us the resolution needed to see low-freq peaks
+
     frequencies, psd = welch(df1['Amplitude'].values, fs=fs, nperseg=4096)
 
-    # plot the frequency against PSD
-    # we use semilogy to see the differences in energy levels clearly
     plt.semilogy(frequencies, psd, label=f"Φ = {phi_value:.3f}")
 
-# now we format the graph for the paper
+    if abs(phi_value - 0.769) < 0.001:
+        peak_index = np.argmax(psd[1:]) + 1
+        peak_freq = frequencies[peak_index]
+        peak_power = psd[peak_index]
+
+        plt.plot(peak_freq, peak_power, 'ro')
+
+        plt.annotate(
+            f"{peak_freq:.1f} Hz",
+            xy=(peak_freq, peak_power),
+            xytext=(peak_freq + 50, peak_power * 3),
+            fontsize=14,
+            arrowprops=dict(arrowstyle="->")
+        )
+
 plt.xlabel("Frequency (Hz)")
-plt.ylabel("Power Spectral Density (PSD)")
+plt.ylabel("PSD")
+plt.xlim(0, 100)
+plt.grid(True, alpha=0.3)
+plt.legend(title="Φ")
 
-# Prof De requested to show precursors, so we zoom into 0-100 Hz
-plt.xlim(0, 100) 
-plt.grid(True, which="both", ls="-", alpha=0.3)
-plt.legend(title="Equivalence Ratio (Φ)")
 plt.tight_layout()
-plt.axhline(y=0.02, linestyle='--', color='black')
-
-# saving the figure for git
 plt.savefig("Figure_2_LBO_FrequencySpectrum.png", dpi=300)
 plt.show()

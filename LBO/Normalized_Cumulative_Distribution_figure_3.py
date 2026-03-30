@@ -18,63 +18,52 @@ I am using the 'Fi/FI_LBO' column for the X-axis because
 it shows the transition reaching the limit at 1.0.
 """
 
-# imports
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 import numpy as np
+import os
 
-# variables
-folder_path = "LBO" 
+plt.rcParams.update({
+    "font.size": 16,
+    "axes.labelsize": 18,
+    "axes.titlesize": 18,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14
+})
+
+folder_path = "."
 main_file = os.path.join(folder_path, "Data details.xlsx")
-air_name = "Air (SLPM)"
-x_axis_col = "Fi/FI_LBO" # using normalized equivalence ratio
 
-# open the main data file
 df = pd.read_excel(main_file)
 
-# creating a list to store the calculated theta value
+x_axis_col = "Fi/FI_LBO"
+threshold = 0.72
+
 theta_values = []
-
-# loop thru the data file to get the air values
-for index, row in df.iterrows():
-    # get the air value for the current row
-    air_value = row[air_name]
-    
-    # open the file with the air value from the LBO folder
-    file_name = os.path.join(folder_path, str(int(air_value)) + ".xlsx")
+for idx, row in df.iterrows():
+    air_value = row["Air (SLPM)"]
+    file_name = os.path.join(folder_path, f"{int(air_value)}.xlsx")
     df1 = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
-
-    # calculate the mean amplitude (Q_bar)
-    Q_bar = df1['Amplitude'].mean()
-
-    # set the threshold at 72% of the mean amplitude
-    threshold = 0.72 * Q_bar
-
-    # count the number of data points below the threshold (flickers)
-    count_below_threshold = (df1['Amplitude'] < threshold).sum()
-
-    # calculate the total number of data points
-    total_data_points = len(df1['Amplitude'])
-
-    # check for division by zero
-    if total_data_points > 0:
-        # calculate theta
-        theta = count_below_threshold / total_data_points
-    else:
-        theta = 0
-
+    
+    count_below = (df1['Amplitude'] < threshold).sum()
+    total = len(df1)
+    theta = count_below / total
     theta_values.append(theta)
 
-# now we plot the theta values against the normalized equivalence ratio
 plt.figure(figsize=(8, 6))
-plt.plot(df[x_axis_col], theta_values, marker='o', linestyle='-', color='tab:red')
-plt.axhline(y=0.02, linestyle='--', color='black')
-# labeling for the paper
-plt.xlabel("Fi/FI_LBO")
-plt.ylabel('Theta (Θ)')
+
+plt.plot(df[x_axis_col], theta_values, marker='o', markersize=6, linewidth=2)
+
+plt.axhline(y=0.02, linestyle='--', linewidth=1.5)
+
+plt.xlabel("Φ / Φ_LBO", fontsize=18)
+plt.ylabel("Θ", fontsize=18)
+
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+
 plt.grid(True, alpha=0.3)
 
-# saving for git
+plt.tight_layout()
 plt.savefig("Figure_3_LBO_Theta_revised.png", dpi=300)
 plt.show()
