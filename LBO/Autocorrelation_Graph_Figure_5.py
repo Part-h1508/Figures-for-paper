@@ -1,12 +1,10 @@
 """
-this file is to simulate the 5th figure
-the graph describes the autocorrelation decay nearing LBO
+this file is to simulate the 5th figure (corrected)
+the graph describes autocorrelation decay nearing LBO
 
-Earlier version manually forced the physics by assigning colors
-to specific air flow values. That approach has been removed.
-
-Now the curves are plotted directly from the data so that the
-ordering of decay behaviour is determined by the actual signals.
+updated based on prof feedback:
+we now use a short segment instead of full signal
+to capture local behaviour properly
 """
 
 import pandas as pd
@@ -20,10 +18,7 @@ df_details = pd.read_excel(main_file)
 
 plt.figure(figsize=(10, 6))
 
-# selecting the same three operating points used earlier
-# index 9 (90 SLPM) -> Φ ≈ 0.769
-# index 3 (80 SLPM) -> Φ ≈ 0.865
-# index 0 (65 SLPM) -> Φ ≈ 1.065
+# same operating points
 plot_indices = [9, 3, 0]
 
 for idx in plot_indices:
@@ -39,18 +34,23 @@ for idx in plot_indices:
     # sampling frequency
     fs = 1 / (df_signal['Time'].iloc[1] - df_signal['Time'].iloc[0])
 
-    # remove mean from signal
+    # remove mean
     signal = (df_signal['Amplitude'] - df_signal['Amplitude'].mean()).to_numpy()
-    
-    # autocorrelation calculation
-    corr = np.correlate(signal, signal, mode='full')
 
+    # 🔥 KEY FIX: use only first 2 seconds
+    signal = signal[:int(2 * fs)]
+
+    # autocorrelation
+    corr = np.correlate(signal, signal, mode='full')
     center = corr.size // 2
 
-    # look at first 100 ms of lag
-    max_lag = int(0.1 * fs)
-    
+    # 🔥 KEY FIX: shorter lag window (30 ms)
+    max_lag = int(0.03 * fs)
+
     rxx = corr[center:center + max_lag] / corr[center]
+
+    # optional smoothing (kept very light)
+    rxx = np.convolve(rxx, np.ones(5)/5, mode='same')
 
     lag_time_ms = (np.arange(max_lag) / fs) * 1000
 
@@ -60,10 +60,9 @@ plt.xlabel("Lag Time (ms)")
 plt.ylabel("Autocorrelation Coefficient")
 
 plt.axhline(0, color='black', linewidth=1, alpha=0.5)
-
 plt.grid(True, alpha=0.3)
 plt.legend(title="Equivalence Ratio (Φ)")
-plt.tight_layout()
 
-plt.savefig("Figure_5_LBO_Autocorrelation.png", dpi=300)
+plt.tight_layout()
+plt.savefig("Figure_5_LBO_Autocorrelation_FIXED.png", dpi=300)
 plt.show()
