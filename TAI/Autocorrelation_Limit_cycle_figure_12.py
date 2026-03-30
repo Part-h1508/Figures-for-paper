@@ -1,64 +1,61 @@
 """
-this file is to simulate the 12th figure
-the graph describes the persistence of the TAI rhythm
-The fig includes:
-
-Autocorrelation curves for three Reynolds numbers.
-
-We find:
-Stable (Re: 1565.85) --> Sharp decay to zero (random noise)
-Intermittent (Re: 4175.60) --> Oscillations with decaying envelope
-Limit Cycle (Re: 5532.67) --> Persistent, steady sine-wave 
-    (deterministic memory of the limit cycle)
+this file is to simulate autocorrelation for TAI
+the graph describes temporal behaviour of pressure signal
 """
 
-# imports
-import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 import os
 
-# variables
-folder_path = "TAI" 
-re_map = {15: 1565.85, 40: 4175.60, 53: 5532.67}
-plot_files = [15, 40, 53]
-fs = 44100  # High resolution sampling frequency
+folder_path = os.path.dirname(os.path.abspath(__file__))
+
+re_map = {
+    15: 1565.85,
+    40: 4175.60,
+    53: 5532.67
+}
 
 plt.figure(figsize=(10, 6))
 
-for file_num in plot_files:
-    re_val = re_map[file_num]
+for file_num, re_val in re_map.items():
+
     file_name = os.path.join(folder_path, f"{file_num}.xlsx")
     
-    # Read amplitude from single column
     df = pd.read_excel(file_name, header=None)
     signal = df[0].to_numpy()
-    
-    # Center the signal
+
+    # remove mean
     signal = signal - np.mean(signal)
-    
-    # We look at 40ms of lag to see multiple cycles
-    max_lag = int(0.04 * fs) 
-    
-    # Calculating autocorrelation using FFT (faster for large signals)
-    # We normalize such that Rxx(0) = 1.0
-    fft = np.fft.fft(np.concatenate([signal, np.zeros(len(signal))]))
-    corr = np.fft.ifft(fft * np.conj(fft)).real[:max_lag]
-    corr = corr / corr[0]
-    
-    lag_time_ms = (np.arange(max_lag) / fs) * 1000
 
-    plt.plot(lag_time_ms, corr, label=f"Re = {re_val:.2f}")
+    # compute max lag first (before expensive autocorrelation)
+    fs = 44100  # same as your PSD
+    max_lag = int(0.03 * fs)
 
-# Formatting for the paper
+    # autocorrelation using FFT (much faster than np.correlate)
+    padded_size = 2 ** int(np.ceil(np.log2(len(signal) + max_lag)))
+    fft_signal = np.fft.rfft(signal, n=padded_size)
+    power = np.abs(fft_signal) ** 2
+    autocorr = np.fft.irfft(power)[:len(signal)]
+    
+    rxx = autocorr[:max_lag] / autocorr[0]
+
+    # create lag axis
+    lag = np.arange(len(rxx)) / fs * 1000
+
+    rxx = rxx[:max_lag]
+    lag = lag[:max_lag]
+
+    plt.plot(lag, rxx, label=f"Re = {re_val:.0f}")
+    print(f"Processed Re = {re_val:.0f}, max autocorr = {rxx[0]:.2f}")
+
 plt.xlabel("Lag Time (ms)")
 plt.ylabel("Autocorrelation Coefficient")
-plt.title("Figure 12: TAI Autocorrelation Persistence")
+
 plt.axhline(0, color='black', linewidth=1, alpha=0.5)
 plt.grid(True, alpha=0.3)
-plt.legend(title="Reynolds Number (Re)")
-plt.tight_layout()
+plt.legend()
 
-# Saving for the repo
-plt.savefig("Figure_12_TAI_Autocorrelation.png", dpi=300)
+plt.tight_layout()
+plt.savefig("Figure_TAI_Autocorrelation.png", dpi=300)
 plt.show()
