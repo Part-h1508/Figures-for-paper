@@ -27,14 +27,14 @@ import numpy as np
 import os
 
 plt.rcParams.update({
-    "font.size": 16,
-    "axes.labelsize": 18,
-    "xtick.labelsize": 14,
-    "ytick.labelsize": 14,
-    "legend.fontsize": 14
+    "font.size": 20,
+    "axes.labelsize": 20,
+    "xtick.labelsize": 20,
+    "ytick.labelsize": 20,
+    "legend.fontsize": 15
 })
 
-folder_path = "."
+folder_path = os.path.dirname(__file__)
 main_file = os.path.join(folder_path, "Data details.xlsx")
 
 df = pd.read_excel(main_file)
@@ -77,7 +77,7 @@ plt.xlabel("Frequency (Hz)")
 plt.ylabel("PSD")
 plt.xlim(0, 100)
 plt.grid(True, alpha=0.3)
-plt.legend(title="Φ")
+plt.legend(title="legend")
 
 plt.tight_layout()
 plt.savefig("Figure_2_LBO_FrequencySpectrum.png", dpi=300)

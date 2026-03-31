@@ -13,7 +13,7 @@ import os
 # variables
 folder_path = "TAI"
 
-# mapping files to Reynolds number (same as your PSD code)
+# mapping files to Reynolds number 
 re_map = {
     15: 1565.85, 
     20: 2087.80, 

@@ -33,6 +33,14 @@ main_file = os.path.join(folder_path, "Data details.xlsx")
 air_name = "Air (SLPM)"
 phi_name = "Equivalence ratio"
 
+plt.rcParams.update({
+    "font.size": 22,
+    "axes.labelsize": 22,
+    "xtick.labelsize": 22,
+    "ytick.labelsize": 22,
+    "legend.fontsize": 22
+})
+
 # open the main data file
 df = pd.read_excel(main_file)
 
@@ -67,14 +75,14 @@ for idx in plot_indices:
     plt.plot(frequencies, cumulative_energy, label=f"Φ = {phi_value:.3f}", linewidth=1.5)
 
 # formatting for the paper
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("ξ(Fi)")
+plt.xlabel("Frequency (Hz)", fontsize=22)
+plt.ylabel("ξ(Fi)", fontsize=22)
 
 # focus on the 0-200 Hz range to see the 'step' in energy
 plt.xlim(0, 200) 
 plt.ylim(0, 1.05)
 plt.grid(True, alpha=0.3)
-plt.legend(title="Equivalence Ratio (Φ)")
+plt.legend(title="Equivalence Ratio (Φ)", fontsize=22, title_fontsize=22)
 plt.tight_layout()
 
 # saving for git

@@ -31,7 +31,7 @@ plt.rcParams.update({
     "ytick.labelsize": 14
 })
 
-folder_path = "."
+folder_path = os.path.dirname(__file__)
 main_file = os.path.join(folder_path, "Data details.xlsx")
 
 df = pd.read_excel(main_file)
@@ -56,7 +56,7 @@ plt.plot(df[x_axis_col], theta_values, marker='o', markersize=6, linewidth=2)
 
 plt.axhline(y=0.02, linestyle='--', linewidth=1.5)
 
-plt.xlabel("Φ / Φ_LBO", fontsize=18)
+plt.xlabel("Φ/Φlbo", fontsize=18)
 plt.ylabel("Θ", fontsize=18)
 
 plt.xticks(fontsize=14)

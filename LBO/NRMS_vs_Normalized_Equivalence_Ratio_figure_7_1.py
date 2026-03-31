@@ -60,10 +60,10 @@ plt.plot(df[x_axis_col], nrms_values, marker='s', color='tab:blue', label='Exper
 plt.axhline(y=0.145, linestyle='--', color='black')
 plt.axvline(x=1.115, linestyle='--', color='red',)
 
-plt.xlabel("Normalized Equivalence Ratio (Φ/Φ_lbo)")
+plt.xlabel("Normalized Equivalence Ratio (Φ/ΦLBO)")
 plt.ylabel('NRMS')
 
 plt.grid(True, alpha=0.3)
 
-plt.savefig("Figure_6_NRMS.png", dpi=300)
+plt.savefig("Figure_6_NRMS_revised.png", dpi=300)
 plt.show()

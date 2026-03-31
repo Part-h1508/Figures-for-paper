@@ -29,11 +29,11 @@ import numpy as np
 import os
 
 plt.rcParams.update({
-    "font.size": 16,
-    "axes.labelsize": 18,
-    "axes.titlesize": 18,
-    "xtick.labelsize": 14,
-    "ytick.labelsize": 14
+    "font.size": 20,
+    "axes.labelsize": 20,
+    "axes.titlesize": 20,
+    "xtick.labelsize": 20,
+    "ytick.labelsize": 20
 })
 
 folder_path = "."
