@@ -80,5 +80,5 @@ plt.grid(True, alpha=0.3)
 plt.legend()
 
 plt.tight_layout()
-plt.savefig("Figure_TAI_Autocorrelation.png", dpi=300)
+plt.savefig("Figure_TAI_Autocorrelation_ex.png", dpi=300)
 plt.show()
