@@ -1,11 +1,12 @@
 """
-Autocorrelation plot for LBO (corrected)
+this file is to simulate autocorrelation for LBO (final corrected)
+the graph describes temporal behaviour of the flame signal
 
-Fixes applied:
-- Proper normalization so r(0) = 1
-- No smoothing that distorts zero-lag value
-- Uses short segment for local behaviour
-- Clear and correct implementation
+updated based on prof feedback:
+--> using Excel CORREL style (pearson correlation)
+--> using short segment (2 sec)
+--> removed unstable high lag region
+--> fixed axis label and font size
 """
 
 import pandas as pd
@@ -13,17 +14,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-plt.rcParams.update({
-    "font.size": 22,
-    "axes.labelsize": 22,
-    "xtick.labelsize": 22,
-    "ytick.labelsize": 22,
-    "legend.fontsize": 22
-})
-
 folder_path = "LBO"
 main_file = os.path.join(folder_path, "Data details.xlsx")
 df_details = pd.read_excel(main_file)
+
+# increase font size
+plt.rcParams.update({
+    'font.size': 14,
+    'axes.labelsize': 16,
+    'legend.fontsize': 12
+})
 
 plt.figure(figsize=(10, 6))
 
@@ -36,44 +36,54 @@ for idx in plot_indices:
 
     air_val = row['Air (SLPM)']
     phi_val = row['Equivalence ratio']
-
+    
     file_name = os.path.join(folder_path, f"{int(air_val)}.xlsx")
     df_signal = pd.read_excel(file_name, header=None, names=['Time', 'Amplitude'])
 
-    # sampling frequency
-    dt = df_signal['Time'].iloc[1] - df_signal['Time'].iloc[0]
-    fs = 1 / dt
-
-    # remove mean
+    time = df_signal['Time'].to_numpy()
     signal = df_signal['Amplitude'].to_numpy()
-    signal = signal - np.mean(signal)
+
+    # sampling frequency
+    fs = 1 / (time[1] - time[0])
 
     # use only first 2 seconds
-    N = int(2 * fs)
-    signal = signal[:N]
+    signal = signal[:int(2 * fs)]
 
-    # compute autocorrelation (normalized)
-    corr = np.correlate(signal, signal, mode='full')
-    center = len(corr) // 2
+    # autocorrelation (Excel CORREL style)
+    acf = []
 
-    # normalize → ensures r(0) = 1
-    corr = corr / corr[center]
+    max_lag = 15
+    min_points = 50   # avoid weird tail
 
-    # lag window (30 ms)
-    max_lag = int(0.03 * fs)
-    rxx = corr[center:center + max_lag]
+    for k in range(max_lag + 1):
 
-    lag_time_ms = (np.arange(max_lag) / fs) * 1000
+        if k == 0:
+            x1 = signal
+            x2 = signal
+        else:
+            x1 = signal[:-k]
+            x2 = signal[k:]
 
-    plt.plot(lag_time_ms, rxx, label=f"Φ = {phi_val:.3f}")
+        # stop if too few points
+        if len(x1) < min_points:
+            break
 
-plt.xlabel("Lag Time (ms)", fontsize=22)
-plt.ylabel("Autocorrelation Coefficient", fontsize=22)
+        r = np.corrcoef(x1, x2)[0, 1]
+        acf.append(r)
 
-plt.axhline(0, color='black', linewidth=1, alpha=0.5)
+    acf = np.array(acf)
+    acf = np.nan_to_num(acf)
+
+    lag = np.arange(len(acf))
+
+    plt.plot(lag, acf, label=f"Φ = {phi_val:.3f}")
+
+plt.xlabel("Lag")
+plt.ylabel("Autocorrelation Function")
+
 plt.grid(True, alpha=0.3)
-plt.legend(title="Equivalence Ratio (Φ)", fontsize=16, title_fontsize=16)
+plt.legend(title="Equivalence Ratio (Φ)")
 
 plt.tight_layout()
-plt.savefig("Figure_5_LBO_Autocorrelation_FIXED_again.png", dpi=300)
+plt.savefig("Figure_LBO_Autocorrelation_FINAL.png", dpi=300)
 plt.show()

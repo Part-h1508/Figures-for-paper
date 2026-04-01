@@ -1,6 +1,11 @@
 """
 this file is to simulate autocorrelation for TAI
 the graph describes temporal behaviour of pressure signal
+
+updated:
+--> using Excel CORREL style (pearson correlation)
+--> using short segment (2 sec)
+--> removed unstable high lag region
 """
 
 import numpy as np
@@ -8,11 +13,19 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 
-folder_path = os.path.dirname(os.path.abspath(__file__))
+# variables
+folder_path = "TAI"
 
+# mapping files to Reynolds number
 re_map = {
-    15: 1565.85,
-    40: 4175.60,
+    15: 1565.85, 
+    20: 2087.80, 
+    25: 2609.75, 
+    30: 3131.70, 
+    35: 3653.65, 
+    40: 4175.60, 
+    45: 4697.55, 
+    50: 5219.50, 
     53: 5532.67
 }
 
@@ -25,34 +38,44 @@ for file_num, re_val in re_map.items():
     df = pd.read_excel(file_name, header=None)
     signal = df[0].to_numpy()
 
-    # remove mean
-    signal = signal - np.mean(signal)
+    # sampling frequency (assume uniform time step)
+    # if time column exists, use that instead
+    fs = 44100  # keep same as your experiment
 
-    # compute max lag first (before expensive autocorrelation)
-    fs = 44100  # same as your PSD
-    max_lag = int(0.03 * fs)
+    # use only first 2 seconds
+    signal = signal[:int(2 * fs)]
 
-    # autocorrelation using FFT (much faster than np.correlate)
-    padded_size = 2 ** int(np.ceil(np.log2(len(signal) + max_lag)))
-    fft_signal = np.fft.rfft(signal, n=padded_size)
-    power = np.abs(fft_signal) ** 2
-    autocorr = np.fft.irfft(power)[:len(signal)]
-    
-    rxx = autocorr[:max_lag] / autocorr[0]
+    # autocorrelation
+    acf = []
 
-    # create lag axis
-    lag = np.arange(len(rxx)) / fs * 1000
+    max_lag = 15
+    min_points = 50
 
-    rxx = rxx[:max_lag]
-    lag = lag[:max_lag]
+    for k in range(max_lag + 1):
 
-    plt.plot(lag, rxx, label=f"Re = {re_val:.0f}")
-    print(f"Processed Re = {re_val:.0f}, max autocorr = {rxx[0]:.2f}")
+        if k == 0:
+            x1 = signal
+            x2 = signal
+        else:
+            x1 = signal[:-k]
+            x2 = signal[k:]
 
-plt.xlabel("Lag Time (ms)")
-plt.ylabel("Autocorrelation Coefficient")
+        if len(x1) < min_points:
+            break
 
-plt.axhline(0, color='black', linewidth=1, alpha=0.5)
+        r = np.corrcoef(x1, x2)[0, 1]
+        acf.append(r)
+
+    acf = np.array(acf)
+    acf = np.nan_to_num(acf)
+
+    lag = np.arange(len(acf))
+
+    plt.plot(lag, acf, label=f"Re = {re_val:.0f}")
+
+plt.xlabel("Lag")
+plt.ylabel("Autocorrelation Function")
+
 plt.grid(True, alpha=0.3)
 plt.legend()
 

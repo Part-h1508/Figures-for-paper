@@ -3,6 +3,10 @@ this file is to simulate NRMS for TAI
 the graph describes fluctuation intensity of pressure signal
 
 We plot NRMS vs Reynolds number
+
+updated:
+--> fixed NRMS definition for oscillatory signal
+--> avoids division by near-zero mean
 """
 
 import numpy as np
@@ -25,6 +29,7 @@ re_map = {
     50: 5219.50, 
     53: 5532.67
 }
+
 nrms_values = []
 re_values = []
 
@@ -39,7 +44,8 @@ for file_num, re_val in re_map.items():
     mean_val = np.mean(signal)
     std_val = np.std(signal)
 
-    nrms = std_val / mean_val
+    # FIX: use mean absolute value instead of mean
+    nrms = std_val / np.mean(np.abs(signal))
 
     nrms_values.append(nrms)
     re_values.append(re_val)
@@ -50,6 +56,7 @@ plt.plot(re_values, nrms_values, marker='o')
 
 plt.xlabel("Reynolds Number (Re)")
 plt.ylabel("NRMS")
+
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()

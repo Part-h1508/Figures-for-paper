@@ -58,10 +58,8 @@ for index, row in df.iterrows():
 plt.figure(figsize=(8, 6))
 plt.plot(df[x_axis_col], theta_values, marker='^', color='tab:red', label='Precursor Duration (Θ)')
 
-plt.xlabel("Normalized Equivalence Ratio (Φ/Φ_lbo)")
-plt.ylabel('Normalized Cumulative Duration (Θ)')
-plt.title('Figure 7.3: LBO Precursor Duration vs Equivalence Ratio')
+plt.xlabel("($\\Phi/\\Phi_{{LBO}}$)", fontsize=22)
+plt.ylabel('Θ', fontsize=22)
 plt.grid(True, alpha=0.3)
-plt.legend()
-plt.savefig("Figure_7_3_LBO_Theta_Final.png", dpi=300)
+plt.savefig("Figure_7_3_LBO_Theta_Final_fonted.png", dpi=300)
 plt.show()
