@@ -57,11 +57,13 @@ plt.figure(figsize=(8, 6))
 plt.plot(df[x_axis_col], nrms_values, marker='s', color='tab:blue', label='Experimental NRMS')
 
 # threshold line suggested by Prof
-plt.axhline(y=0.145, linestyle='--', color='black')
-plt.axvline(x=1.115, linestyle='--', color='red',)
+plt.axhline(y=0.1478, linestyle='--', color='black')
+plt.axvline(x=1.10, linestyle='--', color='red',)
 
-plt.xlabel("($\\Phi/\\Phi_{{LBO}}$)")
-plt.ylabel('NRMS')
+plt.xlabel("$\\Phi/\\Phi_{{LBO}}$", fontsize=22, style='italic')
+plt.ylabel('NRMS', fontsize=22)
+
+plt.tick_params(axis='both', which='major', labelsize=14    )
 
 plt.grid(True, alpha=0.3)
 

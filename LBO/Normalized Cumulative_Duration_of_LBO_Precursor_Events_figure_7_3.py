@@ -58,8 +58,18 @@ for index, row in df.iterrows():
 plt.figure(figsize=(8, 6))
 plt.plot(df[x_axis_col], theta_values, marker='^', color='tab:red', label='Precursor Duration (Θ)')
 
-plt.xlabel("($\\Phi/\\Phi_{{LBO}}$)", fontsize=22)
+# draw threshold lines
+plt.axvline(x=1.0592, linestyle='--', color='black', linewidth=1.5)
+plt.axhline(y=0.0251, linestyle='--', color='black', linewidth=1.5)
+
+# add text at intersection point
+plt.text(1.065, 0.035, 'threshold = 1.0592', fontsize=12, verticalalignment='bottom', horizontalalignment='left')
+
+plt.xlabel("$\\Phi/\\Phi_{{LBO}}$", fontsize=22)
 plt.ylabel('Θ', fontsize=22)
+
+plt.tick_params(axis='both', which='major', labelsize=20)
+
 plt.grid(True, alpha=0.3)
 plt.savefig("Figure_7_3_LBO_Theta_Final_fonted.png", dpi=300)
 plt.show()

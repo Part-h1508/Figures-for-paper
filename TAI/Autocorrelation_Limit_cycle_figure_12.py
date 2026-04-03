@@ -23,12 +23,13 @@ re_map = {
 
 plt.figure(figsize=(10, 6))
 
-# sampling frequency (as used in experiment)
+# Define line styles
+linestyles = ['-', '--', ':']
 fs = 44100
 samples_needed = int(2 * fs)  # 2 seconds
 max_lag = int(0.02 * fs)  # 20 ms
 
-for file_num, re_val in re_map.items():
+for idx, (file_num, re_val) in enumerate(re_map.items()):
 
     file_name = os.path.join(folder_path, f"{file_num}.xlsx")
     
@@ -51,13 +52,15 @@ for file_num, re_val in re_map.items():
 
     lag = (np.arange(max_lag) / fs) * 1000
 
-    plt.plot(lag, rxx, label=f"Re = {re_val:.0f}")
+    plt.plot(lag, rxx, linestyle=linestyles[idx], linewidth=2, label=f"Re = {re_val:.0f}")
 
-plt.xlabel("Lag Time (ms)")
-plt.ylabel("Autocorrelation Function")
+plt.xlabel("Lag Time (ms)", fontsize=20)
+plt.ylabel("Autocorrelation Function", fontsize=20)
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
 
 plt.grid(True, alpha=0.3)
-plt.legend()
+plt.legend(fontsize=20)
 
 plt.tight_layout()
 plt.savefig("Figure_TAI_Autocorrelation_original_1.png", dpi=300)

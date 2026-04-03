@@ -69,14 +69,17 @@ for i, file_num in enumerate(tgt_files):
     plt.plot(x_axis, norm.pdf(x_axis, 0, 1), 'r--', linewidth=2, label='Gaussian')
 
     # formattting
-    plt.title(f"Re: {re_map[file_num]}")
-    plt.xlabel("Normalized amplitude")
+    plt.title(f"Re: {re_map[file_num]}", fontsize=22)
+    plt.xlabel("Normalized amplitude", fontsize=22)
+    plt.ylabel("Probability Density", fontsize=22)
     plt.ylim(0, 0.6) # Lock y-axis so we can compare easily
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
 
     # annotate skewness value on the plot
-    plt.text(-3.5, 0.5, f"Skew = {skew_val:.3f}")
+    plt.text(-3.5, 0.5, f"Skew = {skew_val:.3f}", fontsize=18)
 
-    plt.legend()
+    plt.legend(fontsize=10)
     plt.grid(True, alpha=0.3)
 
 # adjust spacing

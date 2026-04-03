@@ -22,7 +22,10 @@ re_map = {
 
 plt.figure(figsize=(10, 6))
 
-for file_num, re_val in re_map.items():
+# Define line styles
+linestyles = ['-', '--', ':']
+
+for idx, (file_num, re_val) in enumerate(re_map.items()):
 
     file_name = os.path.join(folder_path, f"{file_num}.xlsx")
     
@@ -49,8 +52,8 @@ for file_num, re_val in re_map.items():
     freq = freq[mask]
     power = power[mask]
 
-    # limit to 0–260 Hz
-    mask = freq <= 100
+    # limit to 200–260 Hz
+    mask = (freq >= 200) & (freq <= 260)
     freq = freq[mask]
     power = power[mask]
 
@@ -58,13 +61,16 @@ for file_num, re_val in re_map.items():
     cum_energy = np.cumsum(power)
     cum_energy = cum_energy / cum_energy[-1]
 
-    plt.plot(freq, cum_energy, label=f"Re = {re_val:.0f}")
+    plt.plot(freq, cum_energy, linestyle=linestyles[idx], linewidth=2, label=f"Re = {re_val:.0f}")
 
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("Cumulative Energy")
+plt.xlabel("Frequency (Hz)", fontsize=22)
+plt.ylabel("Cumulative Energy Distribution", fontsize=22)
+plt.xlim(200, 260)
+plt.xticks(fontsize=22)
+plt.yticks(fontsize=22)
 
 plt.grid(True, alpha=0.3)
-plt.legend()
+plt.legend(fontsize=22)
 
 plt.tight_layout()
 plt.savefig("Figure_TAI_Cumulative_Energy.png", dpi=300)

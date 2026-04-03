@@ -19,15 +19,15 @@ folder_path = "TAI"
 
 # mapping files to Reynolds number 
 re_map = {
-    15: 1565.85/4175, 
-    20: 2087.80/4175, 
-    25: 2609.75/4175, 
-    30: 3131.70/4175, 
-    35: 3653.65/4175, 
-    40: 4175.60/4175, 
-    45: 4697.55/4175, 
-    50: 5219.50/4175, 
-    53: 5532.67/4175
+    15: 1565.85, 
+    20: 2087.80, 
+    25: 2609.75, 
+    30: 3131.70, 
+    35: 3653.65, 
+    40: 4175.60, 
+    45: 4697.55, 
+    50: 5219.50, 
+    53: 5532.67 
 }
 
 nrms_values = []
@@ -54,8 +54,15 @@ for file_num, re_val in re_map.items():
 plt.figure(figsize=(8, 6))
 plt.plot(re_values, nrms_values, marker='o')
 
-plt.xlabel("Reynolds Number (Re)")
-plt.ylabel("NRMS")
+# Add threshold lines
+plt.axvline(x=2617, color='red', linestyle='--', linewidth=2)
+plt.axhline(y=1.3316, color='red', linestyle='--', linewidth=2)
+plt.text(2640, 1.3355, "threshold = 2617", fontsize=18, color='black')
+
+plt.xlabel("Reynolds Number (Re)", fontsize=20)
+plt.ylabel("NRMS", fontsize=20)
+plt.xticks(fontsize=20)
+plt.yticks(fontsize=20)
 
 plt.grid(True, alpha=0.3)
 

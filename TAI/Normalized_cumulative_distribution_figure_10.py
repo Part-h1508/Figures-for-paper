@@ -76,13 +76,18 @@ plt.figure(figsize=(8, 6))
 plt.plot(re_list, theta_values, marker='o', linestyle='-', color='tab:blue')
 
 # precursor threshold
-plt.axhline(y=0.16, linestyle='--', color='black')
+plt.axhline(y=0.201, linestyle='--', color='black')
 
 # onset of precursor activity
 plt.axvline(x=2200, linestyle='--', color='red')
 
-plt.xlabel("Reynolds Number (Re)")
-plt.ylabel("Normalized Cumulative Duration (Θ)")
+# Add threshold text at intersection
+plt.text(2230, 0.201, "threshold = 2200", fontsize=18, color='red')
+
+plt.xlabel("Reynolds Number (Re)", fontsize=22)
+plt.ylabel("Normalized Cumulative Duration (Θ)", fontsize=22)
+plt.xticks(fontsize=22)
+plt.yticks(fontsize=22)
 
 plt.grid(True, alpha=0.3)
 
